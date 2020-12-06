@@ -1,4 +1,4 @@
-# Contains the web servers at backend network
+# Contains the cluster servers for the docker swarm
 
 [master]
 ${connection_string_master}
@@ -10,6 +10,11 @@ ${connection_string_workers}
 ${workers_name}
 %{ endfor ~}
 
+[all]
+${master_name}
+%{ for workers_name in list_nodes ~}
+${workers_name}
+%{ endfor ~}
 
 [all:vars]
 environment=prod

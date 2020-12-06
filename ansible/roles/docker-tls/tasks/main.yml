@@ -1,0 +1,55 @@
+---
+
+- name: Configure Docker TLS on Servers
+  block:
+    - name: Configure Docker for TLS
+      script: docker-tls.sh  `hostname`
+      become: false
+
+    - name: Stop docker.service
+      systemd:
+        state: stopped
+        name: docker.service
+
+    - name: Get location of systemctl docker.service unit configuration file
+      shell: "systemctl show -p FragmentPath docker.service | sed 's/=/ /g' | awk '{print $2}'"
+      register: location
+
+    - debug:
+        msg: "{{ location.stdout }}"
+
+    - name: Replace a line in configuration file
+      replace:
+        path: "{{ location.stdout }}"
+        regexp: '^(ExecStart.*containerd.sock)$'
+        replace: 'ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --tlsverify --tlscacert=/home/ubuntu/.docker/ca.pem --tlscert=/home/ubuntu/.docker/server-cert.pem --tlskey=/home/ubuntu/.docker/server-key.pem -H=0.0.0.0:2376'
+
+    - name: Store certs files locally
+      fetch:
+        src: .docker/{{ item }}
+        dest: "docker_certs/{{ inventory_hostname }}/{{ item }}"
+        flat: yes
+      become: false
+      with_items:
+        - 'ca.pem'
+        - 'cert.pem'
+        - 'key.pem'
+
+   # systemctl daemon-reload
+    - name: Reload docker.service
+      shell: "systemctl daemon-reload"
+
+   # systemctl stop docker.service
+    - name: Reload docker.service
+      shell: "systemctl stop docker.service"
+
+   # systemctl start docker.service
+    - name: Reload docker.service
+      shell: "systemctl start docker.service"
+
+    - name: Check docker is working
+      shell: "docker run hello-world"
+      register: hello_world
+
+    - debug:
+        msg: "{{ hello_world.stdout }}"
