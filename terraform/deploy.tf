@@ -123,16 +123,20 @@ locals {
   )
 
   template_inventory_init = templatefile("${path.module}/templates/ansible_inventory.tpl", {
-    connection_strings = join("\n",
-           formatlist("%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh\n%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh\n%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh",
+    connection_string_master = join("\n",
+           formatlist("%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh",
                         openstack_compute_instance_v2.swarm_cluster[0].name,
-                        openstack_compute_floatingip_v2.dockerswarm_floating_ip_master.address,
+                        openstack_compute_floatingip_v2.dockerswarm_floating_ip_master.address))
+
+    connection_string_workers = join("\n",
+           formatlist("%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh\n%s ansible_ssh_host=%s ansible_ssh_user=ubuntu ansible_connection=ssh",
                         openstack_compute_instance_v2.swarm_cluster[1].name,
                         openstack_compute_floatingip_v2.dockerswarm_floating_ip_worker1.address,
                         openstack_compute_instance_v2.swarm_cluster[2].name,
                         openstack_compute_floatingip_v2.dockerswarm_floating_ip_worker2.address))
 
-    list_nodes = var.nodes
+    master_name = var.nodes[0]
+    list_nodes = [var.nodes[1], var.nodes[2]]
   }
   )
 

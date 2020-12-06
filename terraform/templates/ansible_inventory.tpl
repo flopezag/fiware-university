@@ -1,10 +1,15 @@
 # Contains the web servers at backend network
 
-[cluster]
-${connection_strings}
-%{ for node_name in list_nodes ~}
-${node_name}
+[master]
+${connection_string_master}
+${master_name}
+
+[workers]
+${connection_string_workers}
+%{ for workers_name in list_nodes ~}
+${workers_name}
 %{ endfor ~}
+
 
 [all:vars]
 environment=prod
