@@ -1,0 +1,4 @@
+# Python3.8 project
+# Create the corresponding virtualenv: virtualenv -ppython3.8 .env
+ansible==2.10.4
+

@@ -1,0 +1,8 @@
+openstack_user_name = "<your user name>"
+openstack_tenant_name = "<your tenant name>"
+openstack_password = "<the user pasword>"
+openstack_auth_url = "<the url of the OpenStack Keystone service>"
+openstack_region = "<region in which you want to work>"
+openstack_domain_name = "<the domain name use for your project>"
+openstack_flavor = "<default flavour used in your servers>"
+my_ip = "<your public ip, for CIDR access to your machines>"
