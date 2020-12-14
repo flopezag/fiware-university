@@ -1,5 +1,6 @@
-# fiware-university
-Example of deployment a FIWARE Smart City solution using Terraform + Ansible + OpenStack
+# Smart City deployment example
+
+Example of deployment a FIWARE Smart City solution using Terraform + Ansible + OpenStack.
 
 
 ## How to start it
