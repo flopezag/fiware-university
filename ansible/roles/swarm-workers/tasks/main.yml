@@ -1,0 +1,33 @@
+###############################################
+# Configure Master Swarm Node
+###############################################
+---
+
+- name: Configure Docker Swarm Worker Nodes
+  block:
+    - name: Check if Swarm has already been Initialized
+      shell: docker info --format \{\{.Swarm.LocalNodeState\}\}
+      register: swarm_status
+      changed_when: false
+
+    - debug:
+        msg: "{{ swarm_join_token }}"
+
+    - debug:
+        msg: "{{ swarm_manager_ip }}"
+
+    - debug:
+        var=hostvars[inventory_hostname]
+
+    - name: Add Workers to the Swarm
+      shell: "docker swarm join --token {{ swarm_join_token }} {{ swarm_manager_ip }}:2377"
+      when: swarm_status.stdout_lines[0] == "inactive"
+      register: worker
+
+    - name: Show Results
+      debug: var=worker.stdout
+      when: swarm_status.stdout_lines[0] == "inactive"
+
+    - name: Show Errors
+      debug: var=worker.stderr
+      when: swarm_status.stdout_lines[0] == "inactive"

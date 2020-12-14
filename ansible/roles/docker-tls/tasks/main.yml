@@ -1,3 +1,6 @@
+###############################################
+# Configure Docker TLS on Servers
+###############################################
 ---
 
 - name: Configure Docker TLS on Servers
@@ -35,15 +38,15 @@
         - 'cert.pem'
         - 'key.pem'
 
-   # systemctl daemon-reload
+    # systemctl daemon-reload
     - name: Reload docker.service
       shell: "systemctl daemon-reload"
 
-   # systemctl stop docker.service
+    # systemctl stop docker.service
     - name: Reload docker.service
       shell: "systemctl stop docker.service"
 
-   # systemctl start docker.service
+    # systemctl start docker.service
     - name: Reload docker.service
       shell: "systemctl start docker.service"
 

@@ -11,6 +11,13 @@ resource "openstack_compute_secgroup_v2" "sec_group" {
         ip_protocol = "tcp"
         cidr = "0.0.0.0/0"
     }
+
+    rule {
+        from_port = 2377
+        to_port = 2377
+        ip_protocol = "tcp"
+        cidr = "0.0.0.0/0"
+    }
 }
 
 #

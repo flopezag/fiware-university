@@ -3,38 +3,46 @@
 - hosts: all
   become: yes
   gather_facts: no
+
   roles:
      - docker-engine
      - docker-tls
 
-#- hosts: grimoirelab
-#  become: yes
-#  gather_facts: no
-#  roles:
-#    - { role: docker-images,
-#        tags: docker-images,
-#        message: "Docker Images for GrimoireLab Virtual Machine",
-#        images: [
-#          "docker.elastic.co/elasticsearch/elasticsearch:7.9.0",
-#          "mariadb:10.0", "grimoirelab/hatstall:latest",
-#          "bitergia/kibiter:community-v6.8.6-3",
-#          "bitergia/mordred:latest"
-#        ]
-#    }
-#
-#- hosts: grimoirelab
-#  become: yes
-#  gather_facts: no
-#  roles:
-#    - { role: grimoirelab-conf,
-#        tags: grimoirelab-conf,
-#        message: "GrimoireLab Configuration files",
-#        files: [
-#          "apache-hatstall.conf",
-#          "shdb.cfg",
-#          "aliases.json",
-#          "projects.json",
-#          "organizations.json",
-#          "identities.yml"
-#        ]
-#    }
+  tags: docker-config
+
+# swarm cluster init
+- hosts: master
+  gather_facts: No
+  become: yes
+
+  roles:
+     - swarm-master
+
+  tags: ['swarm', 'swarm-master']
+
+# swarm workers join
+- hosts: workers
+  gather_facts: No
+  become: yes
+
+  vars:
+    swarm_manager_ip: "{{ hostvars[groups['master'][0]]['ansible_ssh_host'] }}"
+    swarm_join_token: "{{ hostvars[groups['master'][0]]['worker_token']['stdout'] }}"
+
+  roles:
+     - swarm-workers
+
+  tags: ['swarm', 'swarm-workers']
+
+- hosts: master
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - name: Save Manager hostname
+      local_action: copy content="{{ inventory_hostname }}" dest="cluster-manager.host"
+      run_once: true
+      changed_when: false
+
+  tags: output
+
